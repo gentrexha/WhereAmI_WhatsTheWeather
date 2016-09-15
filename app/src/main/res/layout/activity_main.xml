@@ -9,4 +9,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="rks.gentrexha.whereamiwhatstheweather.mainActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="This simple app shows you your current position on Google Maps"
+        android:id="@+id/txtvWelcome"
+        android:layout_gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tell me more"
+        android:id="@+id/btnMore"
+        android:layout_below="@+id/txtvWelcome"
+        android:layout_alignParentStart="true"
+        android:onClick="btnMoreOnClick" />
 </RelativeLayout>
