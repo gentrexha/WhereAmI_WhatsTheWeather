@@ -1,6 +1,7 @@
 package rks.gentrexha.whereamiwhatstheweather;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -9,18 +10,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class mapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -32,8 +31,9 @@ public class mapActivity extends FragmentActivity implements
     private int locationRequestCode;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private String mLatitudeText;
-    private String mLongitudeText;
+    private String mLatitudeText = "NOLASTVALUE";
+    private String mLongitudeText = "NOLASTVALUE";
+    private Bundle objBundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -65,7 +65,7 @@ public class mapActivity extends FragmentActivity implements
         }
         mMap.setMyLocationEnabled(true);
     }
-
+    // Unused for now
     protected void createLocationRequest()
     {
         LocationRequest mLocationRequest = new LocationRequest();
@@ -106,6 +106,14 @@ public class mapActivity extends FragmentActivity implements
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
             mLongitudeText = String.valueOf(mLastLocation.getLongitude());
         }
+    }
+    public void btnInfoOnClick(View v)
+    {
+        Intent intInfo = new Intent(this, infoActivity.class);
+        objBundle.putString("Lat",mLatitudeText);
+        objBundle.putString("Long",mLongitudeText);
+        intInfo.putExtras(objBundle);
+        startActivity(intInfo);
     }
 
     @Override
