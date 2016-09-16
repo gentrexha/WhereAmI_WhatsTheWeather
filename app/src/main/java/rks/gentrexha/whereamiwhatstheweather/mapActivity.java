@@ -1,9 +1,11 @@
 package rks.gentrexha.whereamiwhatstheweather;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,16 +17,21 @@ import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 public class mapActivity extends FragmentActivity implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener
 {
 
     private GoogleMap mMap;
@@ -105,6 +112,9 @@ public class mapActivity extends FragmentActivity implements
         {
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
             mLongitudeText = String.valueOf(mLastLocation.getLongitude());
+            LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,7));
         }
     }
     public void btnInfoOnClick(View v)
@@ -124,6 +134,12 @@ public class mapActivity extends FragmentActivity implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
     {
 
     }
