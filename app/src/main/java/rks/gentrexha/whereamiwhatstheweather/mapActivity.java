@@ -40,12 +40,21 @@ public class mapActivity extends FragmentActivity implements
     private Location mLastLocation;
     private String mLatitudeText = "NOLASTVALUE";
     private String mLongitudeText = "NOLASTVALUE";
+    private String mAltitude = "NOLASTVALUE";
     private Bundle objBundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the
+            // result of the request.
+        }
         setContentView(R.layout.activity_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -72,15 +81,6 @@ public class mapActivity extends FragmentActivity implements
         }
         mMap.setMyLocationEnabled(true);
     }
-    // Unused for now
-    protected void createLocationRequest()
-    {
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10*60*1000);
-        mLocationRequest.setFastestInterval(500);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
 
     @Override
     protected void onStart()
@@ -112,9 +112,9 @@ public class mapActivity extends FragmentActivity implements
         {
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
             mLongitudeText = String.valueOf(mLastLocation.getLongitude());
+            mAltitude = String.valueOf(mLastLocation.getAltitude());
             LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,7));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
         }
     }
     public void btnInfoOnClick(View v)
@@ -122,6 +122,7 @@ public class mapActivity extends FragmentActivity implements
         Intent intInfo = new Intent(this, infoActivity.class);
         objBundle.putString("Lat",mLatitudeText);
         objBundle.putString("Long",mLongitudeText);
+        objBundle.putString("Alt",mAltitude);
         intInfo.putExtras(objBundle);
         startActivity(intInfo);
     }
