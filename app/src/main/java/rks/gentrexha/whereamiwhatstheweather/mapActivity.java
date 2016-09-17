@@ -20,6 +20,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,28 +39,31 @@ public class mapActivity extends FragmentActivity implements
     private int locationRequestCode;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private String mLatitudeText = "NOLASTVALUE";
-    private String mLongitudeText = "NOLASTVALUE";
-    private String mAltitude = "NOLASTVALUE";
+    private String mLatitudeText = "n/a";
+    private String mLongitudeText = "n/a";
+    private String mAltitude = "n/a";
     private Bundle objBundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
+
+        // Asks for permission to use location services
+        if (ContextCompat.checkSelfPermission
+                (this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    locationRequestCode);
-            // locationRequestCode is an app-defined int constant. The callback method gets the
-            // result of the request.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
         }
+
         setContentView(R.layout.activity_map);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Builds the Google API Client
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -71,13 +75,12 @@ public class mapActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap)
     {
         mMap = googleMap;
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
+        // Asks for permission to use location services
+        if (ContextCompat.checkSelfPermission
+                (this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        locationRequestCode);
-            // locationRequestCode is an app-defined int constant. The callback method gets the
-            // result of the request.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
         }
         mMap.setMyLocationEnabled(true);
     }
@@ -99,17 +102,18 @@ public class mapActivity extends FragmentActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle)
     {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
+        // Asks for permission to use location services
+        if (ContextCompat.checkSelfPermission
+                (this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    locationRequestCode);
-            // locationRequestCode is an app-defined int constant. The callback method gets the
-            // result of the request.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
         }
+
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null)
         {
+            // Moves Camera to latest location and assigns values to variables for the next activity
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
             mLongitudeText = String.valueOf(mLastLocation.getLongitude());
             mAltitude = String.valueOf(mLastLocation.getAltitude());
@@ -130,18 +134,15 @@ public class mapActivity extends FragmentActivity implements
     @Override
     public void onConnectionSuspended(int i)
     {
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-
     }
 
     @Override
     public void onLocationChanged(Location location)
     {
-
     }
 }

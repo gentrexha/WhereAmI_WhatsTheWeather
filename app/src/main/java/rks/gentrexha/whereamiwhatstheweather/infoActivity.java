@@ -19,10 +19,10 @@ import java.net.URL;
 
 public class infoActivity extends AppCompatActivity
 {
-    private String mLatitudeText = "NOSENTVALUE";
-    private String mLongitudeText = "NOSENTVALUE";
-    private TextView txvLat;
-    private TextView txvLong;
+    private String mLatitudeText = "NORECEIVEDVALUE";
+    private String mLongitudeText = "NORECEIVEDVALUE";
+    private String mAltitude = "NORECEIVEDVALUE";
+    private TextView txvInfo;
     static final String API_URL = "http://api.openweathermap.org/data/2.5/weather?lat=";
     static final String API_KEY = "45031aee347ff5ce623d388389a709a1";
     private String mPlace = "N/A";
@@ -33,14 +33,22 @@ public class infoActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-        txvLat = (TextView)findViewById(R.id.txvLat);
-        txvLong = (TextView)findViewById(R.id.txvLong);
+        txvInfo = (TextView)findViewById(R.id.txvLat);
         Bundle objBundle = getIntent().getExtras();
         mLatitudeText = objBundle.getString("Lat");
         mLongitudeText = objBundle.getString("Long");
-        txvLat.setText(mLatitudeText);
-        txvLong.setText(mLongitudeText);
+        mAltitude = objBundle.getString("Alt");
         new RetriveWeather().execute();
+    }
+
+    class RetrieveElevation extends AsyncTask<String,Void,JSONObject>
+    {
+
+        @Override
+        protected JSONObject doInBackground(String... strings)
+        {
+            return null;
+        }
     }
 
     class RetriveWeather extends AsyncTask<String, Void, JSONObject>
@@ -118,21 +126,24 @@ public class infoActivity extends AppCompatActivity
             super.onPostExecute(result);
             if (this.mException != null)
             {
-                txvLat.setText("THERE WAS AN ERROR!");
+                txvInfo.setText("THERE WAS AN ERROR!");
             }
             if(result == null)
             {
-                txvLat.setText("JSONObject is null!");
+                txvInfo.setText("JSONObject is null!");
             }
             try
             {
                 mPlace = result.getString("name");
+                JSONObject main = result.getJSONObject("main");
+                mTemp = main.getString("temp");
             }
             catch (JSONException e)
             {
                 e.printStackTrace();
             }
-            txvLat.setText("You are currently in " + mPlace);
+            txvInfo.setText("You are currently in " + mPlace + ", currently "+ mAltitude +" meters above sea level, "
+            + "and the local temperature is "+mTemp+" degrees celsius.");
         }
     }
 }
