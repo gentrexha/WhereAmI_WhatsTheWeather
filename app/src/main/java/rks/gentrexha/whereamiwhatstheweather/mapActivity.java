@@ -36,13 +36,19 @@ public class mapActivity extends FragmentActivity implements
 {
 
     private GoogleMap mMap;
-    private int locationRequestCode;
+    //
     private GoogleApiClient mGoogleApiClient;
+    //
     private Location mLastLocation;
+    private Location mCurrentLocation;
+    // Variables where information is stored
     private String mLatitudeText = "n/a";
     private String mLongitudeText = "n/a";
     private String mAltitude = "n/a";
+    // Bundle to pass variables to next activity
     private Bundle objBundle = new Bundle();
+    // Have to find out about this one
+    private int locationRequestCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -50,8 +56,7 @@ public class mapActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
 
         // Asks for permission to use location services
-        if (ContextCompat.checkSelfPermission
-                (this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
             // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
@@ -76,8 +81,7 @@ public class mapActivity extends FragmentActivity implements
     {
         mMap = googleMap;
         // Asks for permission to use location services
-        if (ContextCompat.checkSelfPermission
-                (this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
             // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
@@ -103,8 +107,7 @@ public class mapActivity extends FragmentActivity implements
     public void onConnected(@Nullable Bundle bundle)
     {
         // Asks for permission to use location services
-        if (ContextCompat.checkSelfPermission
-                (this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
             // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
@@ -124,6 +127,7 @@ public class mapActivity extends FragmentActivity implements
     public void btnInfoOnClick(View v)
     {
         Intent intInfo = new Intent(this, infoActivity.class);
+        // Passing values to bundle for next activity
         objBundle.putString("Lat",mLatitudeText);
         objBundle.putString("Long",mLongitudeText);
         objBundle.putString("Alt",mAltitude);

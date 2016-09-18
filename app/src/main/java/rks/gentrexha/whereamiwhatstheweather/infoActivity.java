@@ -16,17 +16,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 
 public class infoActivity extends AppCompatActivity
 {
-    private String mLatitudeText = "NORECEIVEDVALUE";
-    private String mLongitudeText = "NORECEIVEDVALUE";
-    private String mAltitude = "NORECEIVEDVALUE";
+    private String mLatitudeText = "n/a";
+    private String mLongitudeText = "n/a";
+    private String mAltitude = "n/a";
     private TextView txvInfo;
     static final String API_URL = "http://api.openweathermap.org/data/2.5/weather?lat=";
     static final String API_KEY = "45031aee347ff5ce623d388389a709a1";
-    private String mPlace = "N/A";
-    private String mTemp = "N/A";
+    private String mPlace = "n/a";
+    private String mTemp = "n/a";
+    DBHelper objDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,16 +36,22 @@ public class infoActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         txvInfo = (TextView)findViewById(R.id.txvLat);
+        objDB = new DBHelper(this);
+
         Bundle objBundle = getIntent().getExtras();
         mLatitudeText = objBundle.getString("Lat");
         mLongitudeText = objBundle.getString("Long");
+
+        // I have to shorten the Lat and Long values because the API often doesn't read them
+        mLatitudeText = mLatitudeText.substring(0, mLatitudeText.length()-5);
+        mLongitudeText = mLongitudeText.substring(0, mLongitudeText.length()-5);
         mAltitude = objBundle.getString("Alt");
+
         new RetriveWeather().execute();
     }
 
     class RetrieveElevation extends AsyncTask<String,Void,JSONObject>
     {
-
         @Override
         protected JSONObject doInBackground(String... strings)
         {
@@ -110,7 +118,10 @@ public class infoActivity extends AppCompatActivity
                     try
                     {
                         objInStream.close(); // this will close the bReader as well
-                    } catch (IOException ignored) {}
+                    }
+                    catch (IOException ignored)
+                    {
+                    }
                 }
                 if (objURLConnection != null)
                 {
@@ -144,6 +155,7 @@ public class infoActivity extends AppCompatActivity
             }
             txvInfo.setText("You are currently in " + mPlace + ", currently "+ mAltitude +" meters above sea level, "
             + "and the local temperature is "+mTemp+" degrees celsius.");
+            objDB.insertLocation(mPlace,mTemp,new SimpleDateFormat("dd.MM.yyyy:HH:mm").format(new java.util.Date()));
         }
     }
 }
