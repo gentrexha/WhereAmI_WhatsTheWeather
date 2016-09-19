@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -24,8 +25,12 @@ public class infoActivity extends AppCompatActivity
     private String mLongitudeText = "n/a";
     private String mAltitude = "n/a";
     private TextView txvInfo;
-    static final String API_URL = "http://api.openweathermap.org/data/2.5/weather?lat=";
-    static final String API_KEY = "45031aee347ff5ce623d388389a709a1";
+    // OpenWeather API
+    static final String openweatherAPIURL = "http://api.openweathermap.org/data/2.5/weather?lat=";
+    static final String openweatherAPIKey = "45031aee347ff5ce623d388389a709a1";
+    // GoogleMaps Elevation API
+    static final String elevationAPIURUL = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
+    static final String elevationAPIKey = "AIzaSyBvs_wbNGAqayC9V5sApoDzCi0gwfYszlQ";
     private String mPlace = "n/a";
     private String mTemp = "n/a";
     DBHelper objDB;
@@ -42,20 +47,97 @@ public class infoActivity extends AppCompatActivity
         mLatitudeText = objBundle.getString("Lat");
         mLongitudeText = objBundle.getString("Long");
 
-        // I have to shorten the Lat and Long values because the API often doesn't read them
-        mLatitudeText = mLatitudeText.substring(0, mLatitudeText.length()-5);
-        mLongitudeText = mLongitudeText.substring(0, mLongitudeText.length()-5);
-        mAltitude = objBundle.getString("Alt");
-
+        new RetrieveElevation().execute();
         new RetriveWeather().execute();
     }
 
     class RetrieveElevation extends AsyncTask<String,Void,JSONObject>
     {
+        Exception mException = null;
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            this.mException = null;
+        }
+
         @Override
         protected JSONObject doInBackground(String... strings)
         {
-            return null;
+            StringBuilder urlString = new StringBuilder();
+            urlString.append(elevationAPIURUL);
+            urlString.append(mLatitudeText);
+            urlString.append(",");
+            urlString.append(mLongitudeText);
+            urlString.append("&key=");
+            urlString.append(elevationAPIKey);
+
+            Log.println(Log.INFO,"ELEVATION URL",urlString.toString());
+
+            HttpURLConnection objURLConnection = null;
+            URL objURL = null;
+            JSONObject objJSON = null;
+            InputStream objInStream = null;
+
+            try
+            {
+                objURL = new URL(urlString.toString());
+                objURLConnection = (HttpURLConnection) objURL.openConnection();
+                objURLConnection.setRequestMethod("GET");
+                objURLConnection.setDoOutput(true);
+                objURLConnection.setDoInput(true);
+                objURLConnection.connect();
+                objInStream = objURLConnection.getInputStream();
+                BufferedReader objBReader = new BufferedReader(new InputStreamReader(objInStream));
+                String line = "";
+                String response = "";
+                while ((line = objBReader.readLine()) != null)
+                {
+                    response += line;
+                }
+                objJSON = (JSONObject) new JSONTokener(response).nextValue();
+            }
+            catch (Exception e)
+            {
+                this.mException = e;
+            }
+            finally
+            {
+                if (objInStream != null)
+                {
+                    try
+                    {
+                        objInStream.close(); // this will close the bReader as well
+                    }
+                    catch (IOException ignored)
+                    {
+                    }
+                }
+                if (objURLConnection != null)
+                {
+                    objURLConnection.disconnect();
+                }
+            }
+            return (objJSON);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject result)
+        {
+            super.onPostExecute(result);
+            try
+            {
+                JSONArray objJSONArray = result.optJSONArray("results");
+                JSONObject objJSONObject = objJSONArray.getJSONObject(0);
+                mAltitude = objJSONObject.getString("elevation");
+                mAltitude = mAltitude.substring(0, Math.min(mAltitude.length(),3));
+                Log.println(Log.INFO,"JSON",mAltitude);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -73,14 +155,18 @@ public class infoActivity extends AppCompatActivity
         @Override
         protected JSONObject doInBackground(String... strings)
         {
+            // I have to shorten the Lat and Long values because the weather API often doesn't read them
+            String mShortLatitudeText = mLatitudeText.substring(0, mLatitudeText.length()-5);
+            String mShortLongitudeText = mLongitudeText.substring(0, mLongitudeText.length()-5);
+
             StringBuilder urlString = new StringBuilder();
-            urlString.append(API_URL);
-            urlString.append(mLatitudeText);
+            urlString.append(openweatherAPIURL);
+            urlString.append(mShortLatitudeText);
             urlString.append("&lon=");
-            urlString.append(mLongitudeText);
+            urlString.append(mShortLongitudeText);
             urlString.append("&units=metric");
             urlString.append("&apiKey=");
-            urlString.append(API_KEY);
+            urlString.append(openweatherAPIKey);
 
             Log.println(Log.INFO,"URL:",urlString.toString());
 
@@ -155,7 +241,8 @@ public class infoActivity extends AppCompatActivity
             }
             txvInfo.setText("You are currently in " + mPlace + ", currently "+ mAltitude +" meters above sea level, "
             + "and the local temperature is "+mTemp+" degrees celsius.");
-            objDB.insertLocation(mPlace,mTemp,new SimpleDateFormat("dd.MM.yyyy:HH:mm").format(new java.util.Date()));
+            mTemp += " " + (char) 0x2103;
+            objDB.insertLocation(mPlace,mTemp,new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()));
         }
     }
 }

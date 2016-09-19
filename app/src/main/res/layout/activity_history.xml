@@ -6,10 +6,18 @@
     android:orientation="vertical"
     tools:context="rks.gentrexha.whereamiwhatstheweather.historyActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Place     Weather     Time"
+        android:paddingLeft="50dp"
+        android:id="@+id/txvInfo" />
+
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
     </ListView>
 
 </LinearLayout>

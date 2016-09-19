@@ -47,7 +47,7 @@ public class DBHelper extends SQLiteOpenHelper
     public Cursor getAllLocations()
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery( "SELECT * FROM " + LOCATION_TABLE_NAME, null );
+        Cursor res = db.rawQuery( "SELECT * FROM " + LOCATION_TABLE_NAME + " ORDER BY " + LOCATION_COLUMN_ID + " DESC", null );
         return res;
     }
 

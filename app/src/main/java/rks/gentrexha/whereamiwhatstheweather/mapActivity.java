@@ -36,15 +36,18 @@ public class mapActivity extends FragmentActivity implements
 {
 
     private GoogleMap mMap;
-    //
+    // Provides the entry point to Google Play services.
     private GoogleApiClient mGoogleApiClient;
-    //
+    // Stores parameters for requests to the FusedLocationProviderApi.
+    protected LocationRequest mLocationRequest;
+    // Represents a geographical location.
     private Location mLastLocation;
     private Location mCurrentLocation;
+    // Tracks the status of the location updates request.
+    protected Boolean mRequestingLocationUpdates;
     // Variables where information is stored
     private String mLatitudeText = "n/a";
     private String mLongitudeText = "n/a";
-    private String mAltitude = "n/a";
     // Bundle to pass variables to next activity
     private Bundle objBundle = new Bundle();
     // Have to find out about this one
@@ -67,6 +70,8 @@ public class mapActivity extends FragmentActivity implements
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mRequestingLocationUpdates = true;
 
         // Builds the Google API Client
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -97,6 +102,14 @@ public class mapActivity extends FragmentActivity implements
     }
 
     @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (mGoogleApiClient.isConnected())
+            stopLocationUpdates();
+    }
+
+    @Override
     protected void onStop()
     {
         mGoogleApiClient.disconnect();
@@ -119,7 +132,6 @@ public class mapActivity extends FragmentActivity implements
             // Moves Camera to latest location and assigns values to variables for the next activity
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
             mLongitudeText = String.valueOf(mLastLocation.getLongitude());
-            mAltitude = String.valueOf(mLastLocation.getAltitude());
             LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
         }
@@ -130,14 +142,41 @@ public class mapActivity extends FragmentActivity implements
         // Passing values to bundle for next activity
         objBundle.putString("Lat",mLatitudeText);
         objBundle.putString("Long",mLongitudeText);
-        objBundle.putString("Alt",mAltitude);
+        mRequestingLocationUpdates = false;
         intInfo.putExtras(objBundle);
         startActivity(intInfo);
+    }
+
+    protected void createLocationRequest()
+    {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected void startLocationUpdates()
+    {
+        // Asks for permission to use location services
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
+        }
+        // The final argument to {@code requestLocationUpdates()} is a LocationListener
+        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates()
+    {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     @Override
     public void onConnectionSuspended(int i)
     {
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -148,5 +187,14 @@ public class mapActivity extends FragmentActivity implements
     @Override
     public void onLocationChanged(Location location)
     {
+        mCurrentLocation = location;
+        if (mCurrentLocation != null)
+        {
+            // Moves Camera to current location and assigns values to variables for the next activity
+            mLatitudeText = String.valueOf(mCurrentLocation.getLatitude());
+            mLongitudeText = String.valueOf(mCurrentLocation.getLongitude());
+            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        }
     }
 }
