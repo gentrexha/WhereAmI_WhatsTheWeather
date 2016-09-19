@@ -128,7 +128,7 @@ public class mapActivity extends FragmentActivity implements
         startLocationUpdates();
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null)
+        if (mLastLocation != null && mCurrentLocation == null)
         {
             // Moves Camera to latest location and assigns values to variables for the next activity
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
