@@ -131,6 +131,7 @@ public class infoActivity extends AppCompatActivity
                 JSONArray objJSONArray = result.optJSONArray("results");
                 JSONObject objJSONObject = objJSONArray.getJSONObject(0);
                 mAltitude = objJSONObject.getString("elevation");
+                // Gets only 3 first chars from elevation
                 mAltitude = mAltitude.substring(0, Math.min(mAltitude.length(),3));
                 Log.println(Log.INFO,"JSON",mAltitude);
             }
@@ -156,8 +157,8 @@ public class infoActivity extends AppCompatActivity
         protected JSONObject doInBackground(String... strings)
         {
             // I have to shorten the Lat and Long values because the weather API often doesn't read them
-            String mShortLatitudeText = mLatitudeText.substring(0, mLatitudeText.length()-5);
-            String mShortLongitudeText = mLongitudeText.substring(0, mLongitudeText.length()-5);
+            String mShortLatitudeText = mLatitudeText.substring(0, Math.min(mLatitudeText.length(),5));
+            String mShortLongitudeText = mLongitudeText.substring(0, Math.min(mLongitudeText.length(),5));
 
             StringBuilder urlString = new StringBuilder();
             urlString.append(openweatherAPIURL);
