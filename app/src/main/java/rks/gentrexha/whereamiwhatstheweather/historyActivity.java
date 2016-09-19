@@ -10,6 +10,11 @@ import android.widget.SimpleCursorAdapter;
 
 import java.util.List;
 
+// References:
+// http://www.androidauthority.com/use-sqlite-store-data-app-599743/
+// http://hmkcode.com/android-custom-listview-items-row/
+// None of these said that the layout file for the cursorAdapter had to be a file in its own...
+
 public class historyActivity extends AppCompatActivity
 {
     private ListView listView;

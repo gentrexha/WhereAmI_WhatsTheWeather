@@ -28,6 +28,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+// References:
+// https://developers.google.com/maps/documentation/android-api/map
+// https://developers.google.com/maps/documentation/android-api/location
+// https://developer.android.com/training/permissions/requesting.html
+// http://blog.teamtreehouse.com/beginners-guide-location-android
+// https://developer.android.com/training/location/retrieve-current.html
+// https://developer.android.com/training/location/change-location-settings.html
+// http://stackoverflow.com/questions/29340410/is-it-possible-to-add-a-button-in-google-maps-activity-to-pass-control-to-ano
+// http://stackoverflow.com/questions/3510649/how-to-pass-a-value-from-one-activity-to-another-in-android
+
 public class mapActivity extends FragmentActivity implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -43,14 +53,11 @@ public class mapActivity extends FragmentActivity implements
     // Represents a geographical location.
     private Location mLastLocation;
     private Location mCurrentLocation;
-    // Tracks the status of the location updates request.
-    protected Boolean mRequestingLocationUpdates;
     // Variables where information is stored
     private String mLatitudeText = "n/a";
     private String mLongitudeText = "n/a";
     // Bundle to pass variables to next activity
     private Bundle objBundle = new Bundle();
-    // Have to find out about this one
     private int locationRequestCode;
 
     @Override

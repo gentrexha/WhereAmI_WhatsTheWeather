@@ -19,8 +19,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
+// References:
+// http://stackoverflow.com/questions/19050294/what-is-the-most-efficient-way-on-android-to-call-http-web-api-calls-that-return
+// http://www.androidauthority.com/use-remote-web-api-within-android-app-617869/
+// http://www.tutorialspoint.com/android/android_json_parser.htm
+// https://developers.google.com/maps/documentation/elevation/intro
+
 public class infoActivity extends AppCompatActivity
 {
+    // Variables which get their values from the bundle
     private String mLatitudeText = "n/a";
     private String mLongitudeText = "n/a";
     private String mAltitude = "n/a";
@@ -130,9 +137,8 @@ public class infoActivity extends AppCompatActivity
             {
                 JSONArray objJSONArray = result.optJSONArray("results");
                 JSONObject objJSONObject = objJSONArray.getJSONObject(0);
-                mAltitude = objJSONObject.getString("elevation");
-                // Gets only 3 first chars from elevation
-                mAltitude = mAltitude.substring(0, Math.min(mAltitude.length(),3));
+                int intAltitude = objJSONObject.getInt("elevation");
+                mAltitude = Integer.toString(intAltitude);
                 Log.println(Log.INFO,"JSON",mAltitude);
             }
             catch (JSONException e)
@@ -156,15 +162,11 @@ public class infoActivity extends AppCompatActivity
         @Override
         protected JSONObject doInBackground(String... strings)
         {
-            // I have to shorten the Lat and Long values because the weather API often doesn't read them
-            String mShortLatitudeText = mLatitudeText.substring(0, Math.min(mLatitudeText.length(),5));
-            String mShortLongitudeText = mLongitudeText.substring(0, Math.min(mLongitudeText.length(),5));
-
             StringBuilder urlString = new StringBuilder();
             urlString.append(openweatherAPIURL);
-            urlString.append(mShortLatitudeText);
+            urlString.append(mLatitudeText);
             urlString.append("&lon=");
-            urlString.append(mShortLongitudeText);
+            urlString.append(mLongitudeText);
             urlString.append("&units=metric");
             urlString.append("&apiKey=");
             urlString.append(openweatherAPIKey);

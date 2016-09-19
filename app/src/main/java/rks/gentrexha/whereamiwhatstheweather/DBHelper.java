@@ -6,8 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+// References:
+// http://www.androidauthority.com/use-sqlite-store-data-app-599743/
+
 public class DBHelper extends SQLiteOpenHelper
 {
+    // Variables for the database table
     public static final String DB_NAME = "locations.db";
     private static final int DB_VERSION = 1;
 
