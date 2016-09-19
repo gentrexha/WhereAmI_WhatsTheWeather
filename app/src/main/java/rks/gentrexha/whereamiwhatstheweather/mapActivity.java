@@ -143,7 +143,7 @@ public class mapActivity extends FragmentActivity implements
         // Passing values to bundle for next activity
         objBundle.putString("Lat",mLatitudeText);
         objBundle.putString("Long",mLongitudeText);
-        mRequestingLocationUpdates = false;
+        stopLocationUpdates();
         intInfo.putExtras(objBundle);
         startActivity(intInfo);
     }
