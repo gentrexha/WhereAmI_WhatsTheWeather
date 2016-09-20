@@ -2,16 +2,19 @@ package rks.gentrexha.whereamiwhatstheweather;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
@@ -37,6 +40,7 @@ import com.google.android.gms.maps.model.LatLng;
 // https://developer.android.com/training/location/change-location-settings.html
 // http://stackoverflow.com/questions/29340410/is-it-possible-to-add-a-button-in-google-maps-activity-to-pass-control-to-ano
 // http://stackoverflow.com/questions/3510649/how-to-pass-a-value-from-one-activity-to-another-in-android
+// http://stackoverflow.com/a/27008913/3841083
 
 public class mapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -77,6 +81,8 @@ public class mapActivity extends FragmentActivity implements
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        checkGPSStatus();
 
         // Builds the Google API Client
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -158,8 +164,8 @@ public class mapActivity extends FragmentActivity implements
     protected void createLocationRequest()
     {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(2500);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -203,6 +209,48 @@ public class mapActivity extends FragmentActivity implements
             mLongitudeText = String.valueOf(mCurrentLocation.getLongitude());
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        }
+    }
+
+    private void checkGPSStatus()
+    {
+        LocationManager locationManager = null;
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+        if ( locationManager == null )
+        {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+        try
+        {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+        catch (Exception ignored)
+        {
+        }
+        try
+        {
+            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        }
+        catch (Exception ignored)
+        {
+        }
+        if ( !gps_enabled && !network_enabled )
+        {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mapActivity.this);
+            dialog.setMessage("Your GPS is disabled, for this application to work it has to be enabled!");
+            dialog.setPositiveButton("Enable", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    // This will navigate user to the device location settings screen
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+            AlertDialog alert = dialog.create();
+            alert.show();
         }
     }
 }

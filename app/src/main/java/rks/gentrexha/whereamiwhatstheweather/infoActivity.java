@@ -1,5 +1,8 @@
 package rks.gentrexha.whereamiwhatstheweather;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +27,7 @@ import java.text.SimpleDateFormat;
 // http://www.androidauthority.com/use-remote-web-api-within-android-app-617869/
 // http://www.tutorialspoint.com/android/android_json_parser.htm
 // https://developers.google.com/maps/documentation/elevation/intro
+// http://stackoverflow.com/a/4239019/3841083
 
 public class infoActivity extends AppCompatActivity
 {
@@ -53,9 +57,22 @@ public class infoActivity extends AppCompatActivity
         Bundle objBundle = getIntent().getExtras();
         mLatitudeText = objBundle.getString("Lat");
         mLongitudeText = objBundle.getString("Long");
+        if (isNetworkAvailable())
+        {
+            new RetrieveElevation().execute();
+            new RetriveWeather().execute();
+        }
+        else
+        {
+            txvInfo.setText("You have no available internet connection.");
+        }
+    }
 
-        new RetrieveElevation().execute();
-        new RetriveWeather().execute();
+    private boolean isNetworkAvailable()
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
     class RetrieveElevation extends AsyncTask<String,Void,JSONObject>

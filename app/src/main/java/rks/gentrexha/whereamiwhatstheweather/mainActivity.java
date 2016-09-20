@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 // References:
 // http://stackoverflow.com/a/27008913/3841083
@@ -27,27 +29,50 @@ public class mainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Asks for permission to use location services
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},locationRequestCode);
-            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
-        }
+        checkLocationService();
         checkGPSStatus();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void btnMoreOnClick(View v)
     {
-        Button btnMore = (Button)findViewById(R.id.btnMore);
+        Button btnMore = (Button) findViewById(R.id.btnMore);
+        TextView txvLocation = (TextView) findViewById(R.id.txvLocationService);
         Intent intMap = new Intent(this, mapActivity.class);
-        startActivity(intMap);
+        // Asks for permission to use location services
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            startActivity(intMap);
+        else
+        {
+            txvLocation.setText("Please enable location settings for this application to work!");
+        }
     }
 
     public void btnHistoryOnClick(View v)
     {
-        Button btnHistory = (Button)findViewById(R.id.btnHistory);
+        Button btnHistory = (Button) findViewById(R.id.btnHistory);
         Intent intHistory = new Intent(this, historyActivity.class);
         startActivity(intHistory);
+    }
+
+    private void checkLocationService()
+    {
+        // Asks for permission to use location services
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, locationRequestCode);
+            // locationRequestCode is an app-defined int constant. The callback method gets the result of the request.
+        }
     }
 
     private void checkGPSStatus()

@@ -38,4 +38,13 @@
         android:layout_alignStart="@+id/btnMore"
         android:onClick="btnHistoryOnClick" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/txvLocationService"
+        android:layout_below="@+id/txtvWelcome"
+        android:layout_toEndOf="@+id/btnMore"
+        android:layout_marginStart="36dp" />
+
 </RelativeLayout>
